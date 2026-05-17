@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STEAM Ta'lim Testi</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Raleway:wght@400;700;900&display=swap');
+
+  :root {
+    --bg: #0f0e17;
+    --surface: #1a1833;
+    --card: #211f3a;
+    --accent: #ff6b6b;
+    --green: #06d6a0;
+    --red: #ef476f;
+    --blue: #118ab2;
+    --yellow: #ffd166;
+    --text: #fffffe;
+    --muted: #a7a9be;
+    --border: #2e2c4e;
+    --radius: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    font-family: 'Nunito', sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(ellipse at 20% 20%, #ff6b6b22 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, #06d6a022 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, #118ab211 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 24px 20px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* HEADER */
+  .header {
+    text-align: center;
+    padding: 40px 0 32px;
+  }
+
+  .header .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #ff6b6b, #ffd166);
+    color: #0f0e17;
+    font-weight: 900;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 6px 18px;
+    border-radius: 100px;
+    margin-bottom: 16px;
+  }
+
+  .header h1 {
+    font-family: 'Raleway', sans-serif;
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 900;
+    background: linear-gradient(135deg, #fffffe, #a7a9be);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.1;
+    margin-bottom: 12px;
+  }
+
+  .header p {
+    color: var(--muted);
+    font-size: 15px;
+  }
+
+  /* PROGRESS BAR */
+  .progress-wrap {
+    background: var(--surface);
+    border-radius: 100px;
+    height: 8px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #ff6b6b, #ffd166);
+    border-radius: 100px;
+    transition: width 0.5s cubic-bezier(.4,0,.2,1);
+    width: 0%;
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  .stat-pill {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 8px 18px;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 100px;
+    justify-content: center;
+  }
+
+  .stat-pill .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  .stat-pill.correct .dot { background: var(--green); }
+  .stat-pill.wrong .dot { background: var(--red); }
+  .stat-pill.total .dot { background: var(--yellow); }
+  .stat-pill.num { color: var(--muted); }
+
+  /* QUESTION CARD */
+  .question-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+    margin-bottom: 20px;
+    animation: fadeIn 0.35s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .question-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #ff6b6b, #ffd166, #06d6a0);
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .q-number {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 800;
+    margin-bottom: 14px;
+  }
+
+  .q-text {
+    font-size: clamp(15px, 2.5vw, 18px);
+    font-weight: 700;
+    line-height: 1.55;
+    color: var(--text);
+    margin-bottom: 28px;
+  }
+
+  /* OPTIONS */
+  .options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  @media (max-width: 560px) {
+    .options { grid-template-columns: 1fr; }
+  }
+
+  .option-btn {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    line-height: 1.45;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .option-btn:hover:not(:disabled) {
+    border-color: var(--accent);
+    background: #ff6b6b15;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px #ff6b6b22;
+  }
+
+  .option-btn .label {
+    min-width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    background: var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 800;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+    margin-top: 1px;
+  }
+
+  .option-btn.correct {
+    border-color: var(--green);
+    background: #06d6a018;
+    animation: correctPulse 0.4s ease;
+  }
+
+  .option-btn.correct .label {
+    background: var(--green);
+    color: #0f0e17;
+  }
+
+  .option-btn.wrong {
+    border-color: var(--red);
+    background: #ef476f18;
+    animation: wrongShake 0.4s ease;
+  }
+
+  .option-btn.wrong .label {
+    background: var(--red);
+    color: #fff;
+  }
+
+  .option-btn.reveal-correct {
+    border-color: var(--green);
+    background: #06d6a010;
+  }
+
+  .option-btn.reveal-correct .label {
+    background: var(--green);
+    color: #0f0e17;
+  }
+
+  .option-btn:disabled { cursor: default; transform: none !important; box-shadow: none !important; }
+
+  @keyframes correctPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.025); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes wrongShake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-6px); }
+    60% { transform: translateX(6px); }
+  }
+
+  /* FEEDBACK */
+  .feedback {
+    margin-top: 16px;
+    padding: 14px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    display: none;
+    align-items: center;
+    gap: 10px;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .feedback.show { display: flex; }
+  .feedback.correct-fb { background: #06d6a018; border: 1px solid var(--green); color: var(--green); }
+  .feedback.wrong-fb { background: #ef476f18; border: 1px solid var(--red); color: var(--red); }
+
+  .feedback-icon { font-size: 18px; }
+
+  /* NAVIGATION */
+  .nav-btns {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .nav-btn {
+    flex: 1;
+    padding: 14px 24px;
+    border-radius: 12px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+  }
+
+  .nav-btn.prev {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    color: var(--muted);
+  }
+
+  .nav-btn.prev:hover { border-color: var(--muted); color: var(--text); }
+
+  .nav-btn.next {
+    background: linear-gradient(135deg, #ff6b6b, #ffd166);
+    color: #0f0e17;
+    box-shadow: 0 4px 20px #ff6b6b44;
+  }
+
+  .nav-btn.next:hover { transform: translateY(-2px); box-shadow: 0 8px 28px #ff6b6b55; }
+  .nav-btn:disabled { opacity: 0.4; cursor: default; transform: none !important; }
+
+  /* RESULT SCREEN */
+  .result-screen {
+    display: none;
+    text-align: center;
+    padding: 40px 20px;
+    animation: fadeIn 0.5s ease;
+  }
+
+  .result-screen.show { display: block; }
+
+  .result-icon {
+    font-size: 80px;
+    margin-bottom: 20px;
+    display: block;
+    animation: bounceIn 0.6s ease;
+  }
+
+  @keyframes bounceIn {
+    0% { transform: scale(0); }
+    70% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+
+  .result-title {
+    font-family: 'Raleway', sans-serif;
+    font-size: 36px;
+    font-weight: 900;
+    margin-bottom: 8px;
+  }
+
+  .result-sub {
+    color: var(--muted);
+    margin-bottom: 32px;
+    font-size: 16px;
+  }
+
+  .result-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    max-width: 500px;
+    margin: 0 auto 32px;
+  }
+
+  @media (max-width: 400px) {
+    .result-grid { grid-template-columns: 1fr; }
+  }
+
+  .result-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 20px;
+  }
+
+  .result-card .val {
+    font-size: 36px;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .result-card .lbl {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .result-card.green .val { color: var(--green); }
+  .result-card.red .val { color: var(--red); }
+  .result-card.yellow .val { color: var(--yellow); }
+  .result-card.blue .val { color: #118ab2; }
+
+  .grade-display {
+    background: linear-gradient(135deg, var(--card), var(--surface));
+    border: 2px solid var(--border);
+    border-radius: 20px;
+    padding: 28px;
+    margin-bottom: 28px;
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .grade-letter {
+    font-size: 72px;
+    font-weight: 900;
+    font-family: 'Raleway', sans-serif;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .grade-text { color: var(--muted); font-size: 14px; }
+
+  .restart-btn {
+    background: linear-gradient(135deg, #ff6b6b, #ffd166);
+    color: #0f0e17;
+    border: none;
+    border-radius: 14px;
+    padding: 16px 48px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 24px #ff6b6b44;
+    margin-top: 8px;
+  }
+
+  .restart-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 32px #ff6b6b55; }
+
+  /* QUIZ AREA */
+  #quiz-area { display: block; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="badge">📚 Maktabgacha ta'lim</div>
+    <h1>STEAM Texnologiyalari Testi</h1>
+    <p>200 ta savol • Har bir savolga faqat bitta to'g'ri javob</p>
+  </div>
+
+  <div id="quiz-area">
+    <div class="stats-bar">
+      <div class="stat-pill num" id="stat-num"><span class="dot" style="background:var(--yellow)"></span><span id="num-text">Savol 1/200</span></div>
+      <div class="stat-pill correct"><span class="dot"></span><span id="correct-count">✓ 0 to'g'ri</span></div>
+      <div class="stat-pill wrong"><span class="dot"></span><span id="wrong-count">✗ 0 xato</span></div>
+    </div>
+
+    <div class="progress-wrap"><div class="progress-bar" id="progress-bar"></div></div>
+
+    <div class="question-card" id="question-card">
+      <div class="q-number" id="q-number">SAVOL 1</div>
+      <div class="q-text" id="q-text">Yuklanmoqda...</div>
+      <div class="options" id="options"></div>
+      <div class="feedback" id="feedback">
+        <span class="feedback-icon" id="fb-icon"></span>
+        <span id="fb-text"></span>
+      </div>
+    </div>
+
+    <div class="nav-btns">
+      <button class="nav-btn prev" id="prev-btn" onclick="navigate(-1)">← Oldingi</button>
+      <button class="nav-btn next" id="next-btn" onclick="navigate(1)">Keyingi →</button>
+    </div>
+  </div>
+
+  <div class="result-screen" id="result-screen">
+    <span class="result-icon" id="result-icon">🎓</span>
+    <div class="result-title" id="result-title">Test yakunlandi!</div>
+    <div class="result-sub" id="result-sub">Barcha savollarni ko'rib chiqdingiz</div>
+
+    <div class="grade-display">
+      <div class="grade-letter" id="grade-letter" style="color:var(--yellow)">5</div>
+      <div class="grade-text" id="grade-text">Baho</div>
+    </div>
+
+    <div class="result-grid">
+      <div class="result-card green"><div class="val" id="r-correct">0</div><div class="lbl">✓ To'g'ri</div></div>
+      <div class="result-card red"><div class="val" id="r-wrong">0</div><div class="lbl">✗ Xato</div></div>
+      <div class="result-card yellow"><div class="val" id="r-percent">0%</div><div class="lbl">Foiz</div></div>
+      <div class="result-card blue"><div class="val" id="r-total">200</div><div class="lbl">Jami savol</div></div>
+    </div>
+
+    <button class="restart-btn" onclick="restartQuiz()">🔄 Qaytadan boshlash</button>
+  </div>
+</div>
+
+<script>
+const rawQuestions = [
+  { q: '"Integratsion ta\'lim modeli" qachon yaratilindi?', correct: '2008 yilda', wrong: ['2018 yilda','2014 yilda','2004 yilda'] },
+  { q: '................. bu fikr, g\'oya, niyat yoki biror narsa qilishning maqsadi. Nuqtalar o\'rniga to\'g\'ri javobni qo\'ying', correct: 'Loyiha', wrong: ['Loyihalash','Texnologik xarita','Model'] },
+  { q: 'Integratsiya g\'oyalari jahonda nechinchi asr boshlarida ilgari surila boshlandi?', correct: 'XIX asr oxiri va XX asr boshlarida', wrong: ['XI asr oxiri va XX asr boshlarida','XII asr oxiri va XI asr boshlarida','XIX asr oxiri va XI asr boshlarida'] },
+  { q: 'nem.tendens, lot.ten-dere, yo\'nalmoq, intilmoq. taraqqiyot yo\'nalishi, biron narsaga qiziqish, intilish, moyillik. Ma\'lum o\'y-muloxaza, tasvir yoki asarning asosiy mazmuni, g\'oyasi nima deb ataladi?', correct: 'Tendensiya', wrong: ['Yondashuv','Texnologiya','Enjenriya'] },
+  { q: '"Texnologiya tushunchasi texnikaviy taraqqiyot bilan bog\'liq holda fanga qachon kirib kelgan?"', correct: '1872 yil', wrong: ['1871 yil','1870 yil','1877 yil'] },
+  { q: '"Biz hozir ilm-fan va texnologiya takomillashgan davrda yashamoqdamiz, bu sizning muhandislik noyob tadqiqotlaringiz va rivojlanishingizning ko\'p qismini birlashtiradi, buni esa siz san\'at va matematikani tushunmasdan yarata olmaysiz". Ushbu fikr egasini belgilang', correct: 'Jorjetta Yakman', wrong: ['Fridrix Frebel','K.D. Ushinskiy','G.N. Vodovozova'] },
+  { q: '"O\'zi qila olishiga ko\'zi yetgan bolaga hech qachon yordam berma" kimning shiyori?', correct: 'M.Montessori', wrong: ['K.D.Ushinskiy','Ya.Amos.Komenskiy','F.Frebel'] },
+  { q: 'Takomillashtirilgan "Ilk qadam" davlat o\'quv dasturi qachon tasdiqlangan?', correct: '2022-yil 4-fevralda', wrong: ['2018 yil 7-iyulda','2022-yil 14-fevralda','To\'g\'ri javob yo\'q'] },
+  { q: '"Insonni tarbiyalash", "Onalar va mehribonlik qo\'shiqlari", "Balli o\'yinlar uchun yuzta qo\'shiq" kabi asarlar muallifini belgilang', correct: 'Fridrix Frebel', wrong: ['M.Montessori','K.D.Ushinskiy','Jorjetta Yakman'] },
+  { q: '"Maktabgacha ta\'lim va tarbiya to\'g\'risida"gi Qonun qachon qabul qilingan', correct: 'O\'RQ 595- son 16-dekabr 2019 yil', wrong: ['O\'RQ 595 son 14-dekabr 2019 yil','O\'RQ 637-son 20-fevral.2020 yil','O\'RQ 637 son 23-sentyabr.2020 yil'] },
+  { q: '"R.V.R." ("Rossum\'s Universal Robots") birinchi marta nechinchi yilda sahnalashtirilgan va tomoshabinlar bilan muvaffaqiyat qozongan?', correct: '1921 yilda', wrong: ['1920 yilda','1924 yilda','1931 yilda'] },
+  { q: '"Robotexnika" so\'zini birinchi marta Isaak Asimov 1941 yilda qanday nomli nashr etilgan ilmiy-fantastik hikoyasida ishlatgan?', correct: '"Yolg\'onchi"', wrong: ['"Tan sog\'chi"','"Yolg\'onchi Robo"','To\'g\'ri javob yo\'q'] },
+  { q: '"Robotika" so\'zi qachon va kim tomonidan kiritilingan?', correct: '1920 yilda chex yozuvchisi Karel Kapek va uning ukasi Yozef tomonidan', wrong: ['1921 yilda chex yozuvchisi Karel Kapek va uning ukasi Yozef tomonidan','1920 yilda nemis yozuvchisi K.Dari va uning ukasi Yozef tomonidan','1921 yilda fransuz yozuvchisi Karel Dari va uning ukasi Yozef tomonidan'] },
+  { q: '"Sun\'iy askar" modelini yaratgan olim kim?', correct: '1893 yilda Archi Kempin', wrong: ['1865 yilda dizayner Jonni Breynard','1894 yilda Archi Kempin','To\'g\'ri javob yo\'q'] },
+  { q: '"Texnologiya" tushunchasi texnikaviy taraqqiyot bilan bog\'liq holda fanga nechinchi yilda kirib keldi?', correct: '1872 yilda', wrong: ['1874 yilda','1876 yilda','1974 yilda'] },
+  { q: '(grekcha: "techno" — hunar, usta va "logos" — fan, ta\'lim) ilmiy-praktika asosida xom-ashyoni tayyor mahsulotga aylantirishning usullari — bu?', correct: 'Texnologiya', wrong: ['Muhandislik','Matematika','ilm-fan'] },
+  { q: '...(yunoncha «metodos» - usul, yo\'l) ushbu so\'z nomi qaysi qatorda keltirilgan?', correct: 'Metod', wrong: ['Tamoyil','Vosita','Qonuniyat'] },
+  { q: '...........bu raqamli texnologiyalar bo\'lib, АКТ sohasining rivojlanishini zamonaviy tamoyillari haqida ma\'lumotlar beradi. Bu qanday texnologiya?', correct: 'Digital texnologiyalar', wrong: ['STEAM texnologiyalari','AKT texnologiyalari','Robot texnologiyalar'] },
+  { q: '"Big Ideas Fest" e\'tirofiga sazovor bo\'lgan olima kim?', correct: 'Jorjetta Yakman', wrong: ['Erik Grimson','M.Montessori','A.Leushina'] },
+  { q: '"Birlashtirish", "bog\'lanish", "yig\'ish" ma\'nosini anglatuvchi atamasi ta\'lim jarayonida bir necha ma\'nolarni anglatadi. Bu qaysi ta\'lim?', correct: 'Integratsion', wrong: ['Imitatsion','Yondashuvli','Kompetensiyaviy'] },
+  { q: '"Bolalar bog\'chasi" konsepsiyasini yaratuvchisi bu kim?', correct: 'F.Frebel', wrong: ['M.Montessori','K.D.Ushinskiy','Ya.Amos.Komenskiy'] },
+  { q: '"Bolalarning ijodiy fikrlashini rivojlantirish vositasi" nomli ishlanma kimga tegishli?', correct: 'Erik Robelen', wrong: ['I.G.Pestalotssi','A.P.Usova','Montessori'] },
+  { q: '"Fridrix Frebelning didaktik tizimi" o\'quv moduli nechta kontent blokidan iborat va nechchi turdagi to\'plamlar bilan ta\'minlangan?', correct: '2 kontent va 2 to\'plam', wrong: ['2 kontent va 4 to\'plam','4 kontent va 2 to\'plam','4 kontent va 4 to\'plam'] },
+  { q: '"Integratsion ta\'lim modeli" qachon yaratilindi? (takroriy savol)', correct: '2008 yilda', wrong: ['2006 yilda','2004 yilda','2011 yilda'] },
+  { q: '«Frebel tuhfalari» — bu olim tomonidan ishlab chiqilgan didaktik material bo\'lib, bolani ilk yoshda rivojlanishiga mo\'ljallangan. Ular nechta tuhfadan iborat?', correct: '6 ta tuhfa', wrong: ['7 tuhfa','5 ta tuhfa','8 ta tuhfa'] },
+  { q: '«STEAM forward» xalqaro konferensiyasi qayerda bo\'lib o\'tgan?', correct: '2014-yilda Quddusda', wrong: ['2015-yilda Quddusda','2014 yilda Marokashda','2014 yilda AQSHda'] },
+  { q: '"Texnologiya - bu har qanday ish, faoliyat, mahorat va san\'atda ishlatiladigan uslublar majmuasidir". Bu kimning lug\'atiga tegishli?', correct: 'V.Lopatin', wrong: ['K.D.Ushinskiy','F.Frebel','M.Montessori'] },
+  { q: '......... bu kichkina yog\'och shar, kub va silindr (to\'pning diametri, silindrning asosi va kub tomoni bir xil). Ularning yordami bilan bola ob\'ektlarning turli shakllarini bilib oladi. Qaysi sovg\'a?', correct: 'Ikkinchi sovg\'a', wrong: ['Birinchi sovg\'a','Uchinchi sovg\'a','To\'rtinchi sovg\'a'] },
+  { q: '............. yoshga to\'lgach, asosiy shakllar, ranglar, makon va vaqt haqida ilk tasavvurlari shakllanadi. U obyektning kattaligi va ulami taqqoslash haqidagi g\'oyani shakllantiradi. Qaysi yosh guruhi nazarda tutilgan?', correct: '4-5 yosh', wrong: ['5-6 yosh','6-7 yosh','3-7 yosh'] },
+  { q: '.......................................bu 27 ta mayda kubiklarga bo\'lingan kub, ulardan to\'qqiztasi yanada mayda bo\'laklarga bo\'lingan. Qaysi tuhfa ekanligini javoblar orasidan aniqlang', correct: 'Beshinchi tuhfa', wrong: ['To\'rtinchi tuhfa','Uchinchi tuhfa','Oltinchi tuhfa'] },
+  { q: '...................bu sakkiz kubikka bo\'lingan kub (kub ikkiga, har yarmi to\'rt qismga bo\'linadi). Bu qaysi tuhfa?', correct: '3-tuhfa', wrong: ['5-tuhfa','4-tuhfa','2-tuhfa'] },
+  { q: '..................bu predmetlar va hodisalami ba\'zi bir muhitni alomatlariga ko\'ra farqlash yoki umumiylashtirish natijasidir. Bu nima?', correct: 'Tushuncha', wrong: ['Ma\'lumot','Fikr','Diqqat'] },
+  { q: '"................bu kub, shuningdek yigirma yetti kubikka bo\'linadi, ulaming ko\'plari qismlarga bo\'linadi: plitkalar, diagonal va boshqalar. Bu nechinchi tuhfa?"', correct: '6-tuhfa', wrong: ['5-tuhfa','4-tuhfa','2-tuhfa'] },
+  { q: '"............bolalar keng va tor darvozalar, baland va past taxta devorchalar, uzun va qisqa yo\'lakchalarni yasashga o\'rganadilar. Nuqtalar o\'rnida qaysi yosh guruhlari berilgan?"', correct: 'Kichik 3-4 yosh', wrong: ['O\'rta 4-5 yosh','Katta 5-6 yosh','Tayyorlov 6-7 yosh'] },
+  { q: '"............bu avtomatik boshqariladigan drayvlar bilan harakatlanuvchi shassisi bo\'lgan avtomatik mashina. Bu nima?"', correct: 'Mobil robot', wrong: ['Elektrik robot','General robot','To\'g\'ri javob yo\'q'] },
+  { q: '..........bu yigirma etti kichik kubikka bo\'lingan kub, ulardan to\'qqiztasi kichikroq qismlarga bo\'lingan. Frebelning nechinchi sovg\'asi?', correct: 'Beshinchi sovg\'a', wrong: ['Ikkinchi sovg\'a','Birinchi sovg\'a','Uchinchi sovg\'a'] },
+  { q: '............pedagogik tizimi Bolalar bog\'chasining paydo bo\'lishi tarixi 1837-yilga borib taqaladi, bolalar bog\'chasining asoschisi deb taniqli nemis pedagogi ............. Nuqtalar o\'rnidagi pedagogni belgilang', correct: 'Fridrix Frebel', wrong: ['Mariya Montessori','Jorjetta Yakman','To\'g\'ri javob yo\'q'] },
+  { q: '1920 yilda "Rossum universal robotlar" spektakli sarlavhasida Robot mashhur so\'zi kim tomonidan birinchi bor aytilgan?', correct: 'Karel Chapek', wrong: ['Isaak Asimov','Mariya Montessori','Fridrix Frebel'] },
+  { q: '1996 va 2002 yillar oralig\'ida Finlandiya Milliy ta\'lim kengashi tomonidan o\'qituvchilarning yuqori malakasi va uzluksiz ta\'limini qo\'llash maqsadida qanday dastur ishga tushirildi?', correct: 'LUMA dasturi', wrong: ['STEAM dasturi','PISA dasturi','PERLS dasturi'] },
+  { q: '2009 yilda senator Mark Uorner kimni NCTC ning STEAM 2009 yilning eng yaxshi o\'qituvchisi nominatsiyasini e\'lon qildi?', correct: 'Jorgetta Yakman', wrong: ['Mark Uorner','Avram Linkoln','Massachusets universiteti'] },
+  { q: '2014-yilda Quddusda bo\'lib o\'tgan "STEAM forward" xalqaro konferensiyasida qanday ilg\'or fikrlar keltirilgan?', correct: 'bolalami STEAMga jalb qilish, Fan tili ingliz tilidir, Qizlar uchun STEAM - ta\'lim dasturlari kerak, Science is fun!', wrong: ['"ta\'lim oluvchilar ilmiy usullarni amalda qanday qo\'llashni tushunishga kirishadigan aralash muhitni nazarda tutadi"','mashg\'ulotlarda maxsus texnologik uskunalar ishlatish','barchasi to\'g\'ri'] },
+  { q: '2016-yil natijasiga ko\'ra STEM ta\'lim tizimi bo\'yicha maktabni tamomlaganlar taqsimotiga ko\'ra yuqori texnologiyalar bo\'yicha jadal tarzda rivojlanib borayotgan Xitoy nechinchi o\'rinni egallaydi?', correct: '1 o\'rinni', wrong: ['2 o\'rinni','3 o\'rinni','Unday o\'rin egallamagan'] },
+  { q: '2030-yilgacha maktabgacha ta\'lim bilan qamrab olingan bolalar miqdorini joriy 38,1 foizdan ... foizgacha orttirish vazifasi qo\'yilgan?', correct: '80,8 foizga', wrong: ['56,8 foizga','132,3 foizga','95 foizga'] },
+  { q: '24 yoshli barcha yoshlar orasida matematika yoki fan darajasiga ega bo\'lgan yoshlar ulushi bo\'yicha qaydi davlat 109 mamlakat ichida 29-o\'rinni egallagan?', correct: 'AQSH', wrong: ['Fransiya','Germaniya','Xitoy'] },
+  { q: '3 yoshli bolalarda qanday kognitiv jarayonlar shakllangan bo\'ladi?', correct: 'Sezgilar, faol nutq', wrong: ['tasavvur','tafakkur','ixtiyoriy e\'tibor'] },
+  { q: '6-7 yoshga kelib, bolalar necha % g\'oyalarni mustaqil o\'ylab topishga va ulami amalga oshirish rejasini tasavvur qilishga qodir bo\'ladi?', correct: '20 % gacha', wrong: ['30 % gacha','40 % gacha','50 % gacha'] },
+  { q: 'A.V.Zaporojets nazariyasiga muvofiq, STEM ta\'lim dasturi bolalar faoliyatining o\'ziga xos shakllarini maksimal darajada boyitish nazarda tutilgan bo\'lib ular qaysi qatorda to\'liq ko\'rsatilgan?', correct: 'o\'yinlar, kognitiv tadqiqotlar, dizayn, badiiy va estetik, bir-biri bilan samarali muloqot', wrong: ['o\'yinlar, kognitiv tadqiqotlar, badiiy va estetik, bir-biri bilan samarali muloqot','dizayn, badiiy va estetik, bir-biri bilan samarali muloqot','To\'g\'ri javob yo\'q'] },
+  { q: 'Analitik fikrlash deganda nimani tushuniladi?', correct: 'analitik fikrlash odamga ma\'lumotni tahlil qilish va olingan ma\'lumotlarni birlashtirishga imkon beradi.', wrong: ['analitik fikrlash bu mantiqiy fikrlash jarayonidir;','ilmiy asoslanishga o\'rgatadi','o\'rgatadigan, faoliyat jarayoni sarguzashtli, o\'yinli bo\'lishi'] },
+  { q: 'Aniq reja, maqsad asosida uning natijalanishini kafolatlagan holda pedagogik faoliyat mazmunini ishlab chiqishga qaratilgan harakat mahsuli?', correct: 'Loyiha', wrong: ['Texnologiya','Metodologiya','Tadqiqotchilik'] },
+  { q: 'AQSH dagi Massachusets texnologiya universiteti tomonidan bolalar uchun maxsus ishlab chiqilgan tushunarli va qiziqarli dasturlash tili qaysi?', correct: 'Scratch', wrong: ['Massachusets','Medium','Multimedium'] },
+  { q: 'Atrofdagi narsalar bilan tajriba; Geometrik jismlar va raqamlar bilan harakat qilish orqali matematik haqiqatni rivojlantirish; Bu qaysi modulga tegishli?', correct: '"F. Frebelning didaktik tizimi" ta\'lim moduli', wrong: ['"Jonli va jonsiz tabiat bilan tajriba" ta\'lim moduli','"LEGO - qurilish" ta\'lim moduli','"Matematik rivojlanish" ta\'lim moduli'] },
+  { q: 'Atrofdagi olamni o\'zlashtirishning kompleks vositasi hisoblanib, u bolalaming madaniy rivojlanishi, ta\'lim-tarbiyasi hamda boshqaruv jarayonlarida juda muhim ahamiyat kasb etadi. Bu?', correct: 'Media', wrong: ['Texnologiya','San\'at','Axborot'] },
+  { q: 'Atrofdagi olamni ongli ravishda idrok qilish va olingan bilim, ko\'nikma, malaka va qadriyatlardan o\'quv va amaliy vazifalarni hal qilish uchun foydalanish kompetensiyasi qaysi?', correct: 'Bilish kompetensiyasi', wrong: ['Kommunikativ kompetensiya','Ijtimoiy kompetensiya','Men kompetensiyasi'] },
+  { q: 'Bilimni bolalar tomonidan o\'zlashtirishning xarakterli natijasi, ularda o\'zini o\'rab turgan olamga yordam berish, rahm-shavqat, tabiatga nisbatan insoniy munosabatda bo\'lishga xizmat qiladi. Ya\'ni?', correct: 'Tabiat bilan tanishtirish', wrong: ['Tasviriy faoliyat bilan tanishtirish','Ilm fanga doir diafilmlar bilan tanishtirish','Nutq o\'stirish'] },
+  { q: 'Bilish kompetensiyasi — bu?', correct: 'atrofdagi olamni ongli ravishda idrok qilish va olingan bilim, ko\'nikma, malaka va qadriyatlardan o\'quv va amaliy vazifalarni hal qilish uchun foydalanish', wrong: ['hayotiy vaziyatlarda kattalar va tengdoshlar bilan muloqotda axloq qoidalari va meyorlariga rioya qilgan holda o\'zini tuta olish mahorati','atrofdagi olamni ongli ravishda idrok qilish','muloqotda axloq qoidalari va meyorlariga rioya qilgan holda o\'zini tuta olish mahorati'] },
+  { q: 'Bir qator eksperimental robot modellarida amalga oshirilgan yurish robotlarini loyihalashning dastlabki texnologiyasi qaysi yillarga borib taqaladi?', correct: '1960-yillarda General Electric tomonidan', wrong: ['1970-1980 yillar Mark Tvens','1966-yillarda General Electric tomonidan','1960-yillarda l Electric Motors tomonidan'] },
+  { q: 'Bola rivojlanishining oxirgi mexanizmlari sifatida nimalar amalga oshiriladi?', correct: 'Muloqot, o\'yin, kognitiv tadqiqot', wrong: ['Ijtimoiylashuv','Bolalar bilimini rivojlantirish','Bolalarda tafakkurni rivojlantirish'] },
+  { q: 'Bolalarning ijodiy fikrlashini rivojlantirish vositasi — kim tomonidan kiritilingan?', correct: '(2011) Erik Robelen', wrong: ['(2011) Rut Katchen','(2011) Jorgetta Yakman','To\'g\'ri javob yo\'q'] },
+  { q: 'Bolalar ilm-fan bilan aloqada bo\'lib, ilmiy yutuqlarni amalga oshirish va ularni olimlar kabi fikrlashga yo\'naltirish uchun ilmiy tilni o\'rgana boshlaydilar. Bu fikrlar kimlarga tegishli?', correct: 'Andersson va Gullberg', wrong: ['Andersson va Jorjetta Y','Gullberg','Jojretta Yakman va Montessori'] },
+  { q: 'Bolalarning ijtimoiylashuvi va individuallashuvi shartlari tizimi — bu...?', correct: 'Rivojlantiruvchi ta\'lim muhiti', wrong: ['o\'yin','mehnat','o\'quv'] },
+  { q: 'Bolalarning individual rivojlanishini baholash standartda ikkita diagnostika shaklida taqdim etiladi. Ular qaysilar?', correct: 'pedagogik va psixologik', wrong: ['Psixologik va texnologik','Pedagogic va texnologik','"Frebel tuhfalari" ning jamlanmasi'] },
+  { q: 'Bolalarning o\'z animatsion filmini yaratish orqali turli loyihalarda bolalarning ish natijalarini umumlashtirish va zamonaviy darajada namoyish etish imkonini beradi. Bu qaysi modul?', correct: '"Multstudiya" o\'quv moduli', wrong: ['LEGO-qurilish, konstruksiyalash – STEAM ta\'lim moduli','"Matematik ishlanma" o\'quv moduli','"F.Frebelning didaktik tizimi" o\'quv moduli'] },
+  { q: 'Bolalarning yoshi va individual xususiyatlarini hisobga olgan holda matematik rivojlanish muammolarini kompleks hal qilish: kattaligi, shakli, maydoni, vaqti, soni va hisoblash. Bu qaysi modulga tegishli?', correct: '"Matematik rivojlanish" ta\'lim moduli', wrong: ['"F. Frebelning didaktik tizimi" ta\'lim moduli','"Jonli va jonsiz tabiat bilan tajriba" ta\'lim moduli','"LEGO - qurilish" ta\'lim moduli'] },
+  { q: '"Bolani o\'rab turgan rivojlantiruvchi muhitni faollik markazlariga bo\'lishni tavsiya etgan olimlar kimlar?"', correct: 'Jan Piaje, Erikson, L.Vigotskiy', wrong: ['Jan Piaje, Erikson','Jan Piaje, Montessori, L.Vigotskiy','Jan Piaje, Komenskiy, K.D.Ushinskiy'] },
+  { q: 'Bolaning bilim, ko\'nikma, malaka va qadriyatlari majmui — bu?', correct: 'Kompetensiya', wrong: ['Kompetentlik','Media kompetentlik','Ijtimoiylik'] },
+  { q: 'Bolaning kommunikativ faoliyati – bu...?', correct: 'kattalar va tengdoshlar bilan muloqot va o\'zaro munosabat', wrong: ['ta\'lim-tarbiyaviy jarayonni tashkil etuvchi pedagogik vosita','diqqat, xotira, tafakkurini rivojlantirish','Maktabgacha ta\'lim tashkilotidagi butun o\'quv faoliyati'] },
+  { q: 'Bolaning kompetensiyalari bola rivojining qaysi sohalarida ko\'rsatilgan?', correct: 'Jismoniy rivojlanish va sog\'lom turmush tarzining shakllanishi, ijtimoiy-hissiy rivojlanish; nutq, muloqot, o\'qish va yozish malakalari, bilish jarayonining rivojlanishi, ijodiy rivojlanish', wrong: ['Jismoniy rivojlanish va sog\'lom turmush tarzining shakllanishi, o\'qish va yozish malakalari, bilish jarayonining rivojlanishi, ijodiy rivojlanish','O\'qish va yozish malakalari, bilish jarayonining rivojlanishi, ijodiy rivojlanish','Kommunikativ kompetensiya, ijtimoiy kompetensiya, men kompetensiyasi, bilish kompetensiyasi'] },
+  { q: 'Bolaning sevimli ertagidan tanlangan "j" yoki "r" harfini topish vazifasi beriladi. Bu o\'yin qaysi markazga to\'g\'ri keladi?', correct: 'Til va nutq markazi', wrong: ['Qurilish, yig\'ish, matematika markazi','Syujetli-rolli o\'yin va dramalashtirish markazi','Fan va tabiat markazi'] },
+  { q: 'Bolaning o\'yin jarayoni va uni tashkil qilishda tajriba, bilim va ko\'nikmalardan ijodiy foydalanishi. O\'quv-tarbiyaviy jarayon uchun qanday kompetensiya asos hisoblanadi?', correct: 'O\'yin kompetensiyasi', wrong: ['Ijtimoiy kompetensiya','Men kompetensiyasi','Bilish kompetensiyasi'] },
+  { q: 'Boshlang\'ich ma\'lumotlarga asoslanib kutiladigan natijani tahmin qilish, bashoratlash, rejalashtirish orqali faoliyat yoki jarayon mazmunini ishlab chiqishga qaratilgan amaliy harakat — bu?', correct: 'loyihalash', wrong: ['Ishlab chiqarish','Texnika, texnologiya','Metodologiya'] },
+  { q: '"Bu matnni va ommaviy axborot vositalarini kontekst, istiqbol va mumkin bo\'lgan tarafkashliklami hisobga olgan holda asosiy xabarlami aniqlash uchun faol tahlil qilish qobiliyatidir. Bu qanday savodxonlik?"', correct: 'Tanqidiy savodxonlik', wrong: ['Vizual savodxonlik','Mediasavodxonlik','Raqamli savodxonlik'] },
+  { q: '....bu maxsus texnologiya bo\'lib, dasturiy va texnik moddiy ta\'minot asosida kompyuterda bir vaqtning o\'zida tasviriy axborotni tovushli va harakatli holda ifodalash imkoniyatidir.', correct: 'Multimedia', wrong: ['Texnologiya','Axborot','Dizayn'] },
+  { q: '"Bu statik yoki harakatlanuvchi tasvirlar, grafikalar, ramzlar, diagrammalar, xaritalar kabi vizual ma\'lumotlarning ma\'nosini izohlash va ma\'noga ega bo\'lishdir. Qanday savodxonlik nazarda tutilgan?"', correct: 'Vizual savodxonlik', wrong: ['Mediasavodxonlik','Raqamli savodxonlik','Digital savodxonlik'] },
+  { q: 'Davlat standarti talablariga muvofiq kognitiv rivojlanish o\'z ichiga nimalarni qamrab oladi?', correct: 'Bolalarning qiziquvchanligi va kognitiv motivatsiyalari rivojlantirish', wrong: ['Bolalarda o\'yin faoliyatini rivojlantirish','Bolalarning do\'stlari bilan yaqin munosabatda bo\'lishini ta\'minlash','Bolalarni maktab ta\'limiga tayyorlash'] },
+  { q: 'Engineering so\'zining ma\'nosi nima?', correct: 'Muhandislik', wrong: ['Texnik ijodkorlik','Texnolog','Iste\'dod'] },
+  { q: 'Erik Robelen Bolalarning ijodiy fikrlashini rivojlantirish vositasi nomli qo\'llanmasini nechanchi yil tadbiq etgan?', correct: '2011 yil', wrong: ['2010 yil','2009 yil','2008 yil'] },
+  { q: 'F. Frebelning ulkan yutuqlari bilan birga, tarixdan ma\'lumki, uning pedagogik yondashuvlari qaysi olimlar tomonidan tanqid qilingan?', correct: 'K.D. Ushinskiy, E.A. Flyorina, G.N. Vodovozova', wrong: ['K.D. Ushinskiy, E.A. Flyorina','K.D. Ushinskiy, Ya.A.Komenskiy, M.Montessori','To\'g\'ri javob yo\'q'] },
+  { q: 'F.Frebel bolalarni rivojlantirishda o\'zining ta\'limotida nimani asos qilib oldi?', correct: 'o\'yinni', wrong: ['ta\'limni','tarbiyani','muhitni'] },
+  { q: 'F.Frebel bolaning qaysi yosh davrlariga ahamiyat bergan?', correct: 'go\'daklik, bolalik, o\'smirlik, yoshlik', wrong: ['chaqaloqlik, bolalik, o\'smirlik, yoshlik','go\'daklik, bolalik, yoshlik','go\'daklik, chaqaloqlik, bolalik, yoshlik'] },
+  { q: 'F.Frebelning didaktik materialidagi bolalar uchun birinchi tuhfasi bu.....?', correct: 'koptok', wrong: ['shar va silindr','kub','doira'] },
+  { q: 'Fan, texnologiya, muhandislik, san\'at va matematikani birlashtirgan ta\'limiy yondashuv bu?', correct: 'STEAM', wrong: ['STEM','Ilk qadam davlat dasturi','Ilm yo\'li variativ dasturi'] },
+  { q: 'Fasilitatsiya qanday ma\'noni anglatadi?', correct: 'ingliz tilidan "facilitate" — "osonlashtirish", "rag\'batlantirish", "qulay shart-sharoitlarni yaratish"', wrong: ['lotin tilidan "facilitate" — "osonlashtirish"','nemis tilidan "facilitate" — "osonlashtirish"','fransuz tilidan "facilitate" — "osonlashtirish"'] },
+  { q: 'Frebel dastlab pedagogikaga qanday tamoyil kiritdi?', correct: 'Faoliyat tamoyilini', wrong: ['Ilmiylik tamoyilini','Ko\'rsatma tamoyilini','To\'g\'ri javob yo\'q'] },
+  { q: 'Hayotiy vaziyatlarda kattalar va tengdoshlar bilan muloqotda axloq qoidalari va me\'yorlariga rioya qilgan holda o\'zini tuta olish mahorati — bu?', correct: 'Ijtimoiy kompetensiya', wrong: ['Kompetentlik','Media kompetentlik','Ijtimoiylik'] },
+  { q: '"Hodisa, jarayon yoki tizimning umumiy mohiyatini to\'la yorituvchi modelni yaratish bu?"', correct: 'Modellashtirish', wrong: ['Model','Loyihalashtirish','Loyiha'] },
+  { q: 'Ijodkorlik — bu?', correct: 'hayratlanish, zavqlanish, oddiy ko\'rinadigan narsalardan hayratlanarli va noodatiy narsalami ko\'rish qobiliyatidan boshlanadi.', wrong: ['atrofdagi olam tasvirlarini so\'zlar, tovushlar, tasvirlar orqali namoyish etishga qaratilgan badiiy-estetik boyitilgan inson faoliyati hisoblanadi','ijodiy fikrlash','kreativ, ijodiy fikrlovchi shaxs'] },
+  { q: 'Ijtimoiy kompetensiyaning mazmuni?', correct: 'hayotiy vaziyatlarda kattalar va tengdoshlar bilan muloqotda axloq qoidalari va meyorlariga rioya qilgan holda o\'zini tuta olish mahorati.', wrong: ['atrofdagi olamni ongli ravishda idrok qilish va olingan bilim, ko\'nikma, malaka va qadriyatlardan o\'quv va amaliy vazifalarni hal qilish uchun foydalanish','muloqotda axloq qoidalari va meyorlariga rioya qilgan holda o\'zini tuta olish mahorati','o\'quv va amaliy vazifalarni hal qilish uchun foydalanish'] },
+  { q: 'Integratsion yondashuv turli xil faoliyat turlari o\'zaro bog\'liqligida namoyon bo\'ladi. Ular qaysilar?', correct: 'O\'yin, texnik, nutq, vizual, kommunikativ, kognitiv', wrong: ['O\'yin, vizual, kommunikativ, kognitiv','O\'yin, texnik, nutq, vizual, kommunikativ, ijtimoiy','O\'yin, texnik, nutq, vizual, kommunikativ, emotsional'] },
+  { q: 'Integratsiya — bu?', correct: 'lotincha so\'zdan olingan bo\'lib, lug\'aviy ma\'nosi integratio — "tiklash, to\'ldirish, bir butun" so\'zlari ma\'nosini anglatadi.', wrong: ['inglizcha so\'zdan olingan bo\'lib, lug\'aviy ma\'nosi integratio — "tiklash, to\'ldirish, bir butun" so\'zlari ma\'nosini anglatadi.','lotincha so\'zdan olingan bo\'lib, lug\'aviy ma\'nosi integratio — bog\'liqlik, bog\'lash so\'zlari ma\'nosini anglatadi.','lotincha so\'zdan olingan bo\'lib, lug\'aviy ma\'nosi integratio — "birlik, bog\'lash, bog\'liqlik" so\'zlari ma\'nosini anglatadi.'] },
+  { q: 'Integratsiyalashgan ta\'limda birlashtirilgan yondashuvga asoslanib, pedagogikadagi integratsiya jarayonini boshqa fanlar bilan birlashtirish haqidagi ilg\'or fikrlarini tatbiq etgan olimlar kimlar?', correct: 'olimlar V.V. Krevskiy, N. Talisina', wrong: ['olimlar V.V. Krevskiy, M.Montessori','olimlar A.Feldman, N. Talisina','olimlar Jorjetta Yakman, N. Talisina'] },
+  { q: '"Intellektual qobiliyatlarning rivojlantirishning asosiy bilish jarayonlari nimalarni takomillashtirishga yo\'naltirilgan bo\'lishi kerak?"', correct: 'Idrok, xotira, tasavvur va tafakkur', wrong: ['Idrok, diqqat, tasavvur va tafakkur','Idrok va tafakkur','Xotira, tasavvur va tafakkur'] },
+  { q: '"Internetning eng qulay, eng kerakli va barcha internet foydalanuvchilari ishlatadigan aloqa vositasi hisoblanadi. Bu nima?"', correct: 'Elektron pochta', wrong: ['Ijtimoiy tarmoq','Mediasavodxonlik','Dastur'] },
+  { q: 'Integratsion ta\'lim modelini kim ishlab chiqqan?', correct: 'Jorjette Yakman', wrong: ['G.Catterall','Rod Aylend','Anna Fildman'] },
+  { q: 'Ishlab chiqilgan loyihaning hajmiga qarab loyihalarni qanday guruhga ajratish mumkin?', correct: 'ishlab chiqarish (texnik) va ijtimoiy', wrong: ['ilmiy va ijtimoiy','individual va ijtimoiy','mavzuli va ijtimoiy'] },
+  { q: 'Jismoniy rivojlanish va sog\'lom turmush tarzining shakllanishi bu qaysi kompetensiyaning tarkibiy qismi hisoblanadi?', correct: 'Bola rivojlanishining sohalari kompetensiyalar', wrong: ['Umumiy muhim kompetensiyalar','Kommunikativ kompetensiyalar','Men konsepsiyasi tarkibiga'] },
+  { q: 'Jorjetta Yakman nechinchi yilda o\'zining dizayn yo\'nalishidagi maktabida STEAM ta\'lim texnologiyasini ishlab chiqdi va nechinchi yilda muhandislik va texnologiya o\'qituvchisi sifatida uni joriy eta boshladi?', correct: '2006-2007 yil', wrong: ['2005-2006 yil','2007-2008 yil','2004-2005 yil'] },
+  { q: '"Kattalar bilan tajribalarda qatnashadi (erish, muzlash, magnitlik, bo\'yash, qizdirish, qaynash va hokazolar). Tadqiqiy-bilish va samarali refleksiv faoliyat sohasi qaysi yosh guruhiga tegishli?"', correct: '4-5 yosh', wrong: ['3-4 yosh','5-6 yosh','6-7 yosh'] },
+  { q: 'Kichik yoshdagi bolalarni fan olamiga olib kirishda hayvonot olami, dengiz hayvonlari, o\'simlik va hashoratlar haqidagi kitoblardan foydalansa bo\'ladi. Ushbu ta\'rif STEAM ning qaysi bo\'g\'iniga mos?', correct: 'Sciense bo\'limiga', wrong: ['Technology bo\'limiga','Math bo\'limiga','Art bo\'limiga'] },
+  { q: 'Komenskiy tarbiyaning tabiatga uyg\'unlik masalasida hamma narsaning asosi nechta deb ta\'kidlagan?', correct: '4 ta', wrong: ['3 ta','2 ta','5 ta'] },
+  { q: 'Kvest qanday ma\'noni anglatadi?', correct: 'ing. "Quest" "muammo", "izlanish", "sarguzasht" degan ma\'noni anglatadi', wrong: ['lotin. "Quest" "muammo", "izlanish", "sarguzasht" degan ma\'noni anglatadi','fransuz. "Quest" "muammo", "izlanish", "sarguzasht" degan ma\'noni anglatadi','nemis. "Quest" "muammo", "izlanish", "sarguzasht" degan ma\'noni anglatadi'] },
+  { q: '"Loyihalarning davomiyligi qanday muddatli bo\'ladi?"', correct: 'Qisqa muddatli, o\'rta muddatli, uzoq muddatli', wrong: ['Qisqa muddatli, o\'rta muddatli','Solishtirma, o\'rta muddatli, uzoq muddatli','Qisqa muddatli, o\'rta muddatli, solishtirma'] },
+  { q: 'Loyihani ishlab chiqish turli xil manbalarda monografiyalar, jurnallardagi maqolalar, gazeta nashrlari, elektron ma\'lumotlar bazalarida foydalangan holda ma\'lumotlarni qidirish va izlashni o\'z ichiga olgan Loyiha turi qaysi?', correct: 'Axborot loyihalari', wrong: ['Ijodiy loyihalar','Ilmiy loyihalar','Individual loyihalar'] },
+  { q: '"Maktabgacha katta yoshdan foydalanishga moslashtirilgan maxsus blokli dasturlash tilidir. Bu qaysi dastur?"', correct: 'Scratch Junior', wrong: ['STEAM','Media','Kompyuter'] },
+  { q: 'Maktabgacha ta\'limda STEAM texnologiyasi modullariga nimalar kiradi?', correct: 'LEGO-qurilish, "F.Frebelning didaktik tizimi", Matematik ishlanma, Multstudiya, Robotexnika, Jonli va jonsiz tabiat bilan tajriba o\'tkazish o\'quv modullari', wrong: ['LEGO-qurilish, "F.Frebelning didaktik tizimi", Matematik ishlanma, Multstudiya modullari','LEGO-qurilish, "F.Frebelning didaktik tizimi" modullari','"F.Frebelning didaktik tizimi", Matematik ishlanma, Multstudiya, Robotexnika, Jonli va jonsiz tabiat modullari'] },
+  { q: 'Maktabgacha ta\'limda STEAM texnologiyalari fanining asosiy maqsadi qanday?', correct: 'Maktabgacha yoshdagi bolalarni yangi loyihalar yaratishga kreativ va innovatsion yondashishga o\'rgatish', wrong: ['maktabgacha yoshdagi bolalar nutqiga ta\'sir ko\'rsatish borasida o\'zining orginal usullari va yo\'llarini yaratishga intilishni rag\'batlantirish','Bolaning qadr-qimmatini va uning o\'ziga xosligini tushunish','Bolalarda amaliy faoliyatga tayyorlash'] },
+  { q: 'Maktabgacha ta\'lim tashkilotlarida STEAM faoliyatlari qanday tarzda joriy etilishi mumkin?', correct: 'O\'yin, tajriba va loyiha shaklida', wrong: ['An\'anaviy mashg\'ulotlarni to\'xtatib','Faqat matematik mashqlar orqali','Mashg\'ulotlarni qisqartirish orqali'] },
+  { q: 'Maktabgacha ta\'limda STEAM loyihalari qanday shakllarda amalga oshiriladi?', correct: 'Guruhlarda amaliy faoliyatlar orqali', wrong: ['Faqat nazariy darslar orqali','Ilmiy maqolalar yozish orqali','Test sinovlari orqali'] },
+  { q: 'Maktabgacha ta\'lim tizimini 2030-yilgacha rivojlantirish Konsepsiyasi qachon tasdiqlangan?', correct: '2019-yil 8-may, PQ-4312-son', wrong: ['2019-yil 18-may, PQ-4312-son','2019-yil 8-may, PQ-4012-son','2020-yil 8-may, PQ-4312-son'] },
+  { q: 'Maktabgacha yoshdagi (6-7 yosh) bolaning asosiy tayanch kompetensiyalari keltirilgan to\'g\'ri qatorni belgilang', correct: 'Kommunikativ kompetensiya, Ijtimoiy kompetensiya, Shaxsiy (Men kompetensiyasi), Bilish kompetensiyasi', wrong: ['O\'yin kompetensiyasi, Ijtimoiy kompetensiya, Bilish kompetensiyasi','Kommunikativ kompetensiya, O\'yin kompetensiyasi, Ijtimoiy kompetensiya','Kommunikativ kompetensiya, O\'yin kompetensiyasi, Ijtimoiy kompetensiya, Bilish kompetensiyasi'] },
+  { q: 'Maktabgacha yoshdagi bolalar bilan STEAM metodikasida ishlashda nima muhim?', correct: 'Tajriba va o\'yin orqali o\'rganish', wrong: ['Qoralama yozuvlar tuzish','Darslik bo\'yicha qat\'iy ishlash','Nazorat testlarini ko\'p yozish'] },
+  { q: 'Maktabgacha yoshdagi bolalarga mo\'ljallangan multimediali texnologiyalar joriy an\'anaviy texnologiyalarga nisbatan nimalar bilan farqlanadi?', correct: 'Hamma javoblar to\'g\'ri', wrong: ['materialninig murakkablik darajasi (bolalar uchun sodda materiallar tanlanadi)','materialning bolalarga mosligi (multimedia shaklida)','bolalarning psixologik jihatlari; bolalarning yoshi (5-7 yosh)'] },
+  { q: 'Maktabgacha yoshdagi bolalarning qaysi yosh davrida intellektual qobiliyatlarini rivojlantirishda STEAM ta\'lim texnologiyasida foydalanish juda qo\'l keladi?', correct: '3-7 yosh', wrong: ['4-5 yosh','5-6 yosh','6-7 yosh'] },
+  { q: 'Mariya Montessorining eng mashhur ikki kitobining nomi to\'g\'ri berilgan qatorni belgilang', correct: 'Montessori metodikasi (1916) va Absorbent aql (1949).', wrong: ['"Boyitilgan Montessori metodi" va Absorbent aql (1949).','"Bolalik siri" va Absorbent aql (1949).','"Yangi dunyo ta\'limi" va Absorbent aql (1949).'] },
+  { q: 'Mariya Montessorining noan\'anaviy nechta qoidasi mavjud?', correct: '10 ta', wrong: ['15 ta','11 ta','12 ta'] },
+  { q: 'Mashg\'ulotni o\'tkazish uchun ijodkorlik va psixologik xavfsizlik muhitini yaratish va doimiy ravishda saqlab turish zarur. Bu mashg\'ulotlarni o\'tkazishda qanday usullardan foydalaniladi?', correct: 'og\'zaki usul, vizual usul, amaliy usul, tushuntirish va illyustratsiya usuli, reproduktiv o\'qitish usuli, qisman qidirish usuli', wrong: ['tushuntirish va illyustratsiya usuli, reproduktiv o\'qitish usuli, qisman qidirish usuli','og\'zaki usul, vizual usul, amaliy usul, reproduktiv o\'qitish usuli, qisman qidirish usuli','To\'g\'ri javob yo\'q'] },
+  { q: 'Matematika mashg\'ulotlarida bolalar uchun eng qiyin narsa nima?', correct: 'Vaqt tushunchasi', wrong: ['To\'plam tushunchasi','Obyektlarni o\'lchash','Miqdor tushunchasi'] },
+  { q: 'Media-savodxonlik ta\'limi Buyuk Britaniyada va Qo\'shma Shtatlarda nechinchi yillarda olib borilgan?', correct: '1930 yillarda', wrong: ['1940 yillarda','1931 yillarda','1942 yillarda'] },
+  { q: '"Men dunyoni yarataman" — STEAM texnologiyasining qaysi moduliga kiradi?', correct: 'Multstudiya — STEAM ta\'lim moduli', wrong: ['Robototexnika STEAM ta\'lim moduli','Lego Qurilish ta\'lim moduli','F.Frebel didaktik ta\'lim moduli'] },
+  { q: 'Muammoning, ob\'ekt va mavzuning rivojlanishi, o\'rganish maqsadi, gipoteza, vazifa, muammoni o\'rganish metodologiyasi va uslubini aniqlash; ma\'lumot to\'plash va tahlil qilish. Qanday loyiha turiga kiradi?', correct: 'Ilmiy loyihalar', wrong: ['Ijodiy loyihalar','Axborot loyihalari','Vizual loyihalar'] },
+  { q: 'Muayyan harakat yoki faoliyatni bajarishning avtomatlashtirilgan shakli bu?', correct: 'Malaka', wrong: ['Ko\'nikma','Bilim','Tajriba'] },
+  { q: 'Muloqot vositalaridan turli vaziyatlarda foydalana bilish ko\'nikmasi — bu?', correct: 'Kommunikativ kompetensiya', wrong: ['Ijtimoiy kompetensiya','Men kompetensiyasi','Bilish kompetensiyasi'] },
+  { q: 'Multimedia atamasining lug\'aviy ma\'nosi?', correct: '[multum+medium] (yoki [ingl. multi+media]) kabi ikkita so\'z yig\'indisidan tashkil topgan bo\'lib, multi — ko\'p, media — muhit ma\'nosini anglatadi', wrong: ['[multum+medium] (yoki [lotin. multi+media])','[multum+medium] (yoki [yunon. multi+media])','To\'g\'ri javob yo\'q'] },
+  { q: 'Multstudiyada nechta bola "Men dunyoni yarataman" multistudiyasi bilan shug\'ullanadi?', correct: '10-12 ta bola', wrong: ['10-14 ta bola','10-16 ta bola','10-15 ta bola'] },
+  { q: 'Nechinchi yildan boshlab milliy ta\'lim tizimida STEM paydo bo\'lishi haqida so\'z yuritilmoqda?', correct: '2016 yildan boshlab', wrong: ['2017 yildan boshlab','2018 yildan boshlab','2019 yildan boshlab'] },
+  { q: 'Olingan ma\'lumotlarni olish, qayta ishlash va amalda qo\'llash qobiliyatini rivojlantirish qaysi ta\'lim dasturining asosini tashkil etadi?', correct: 'STEAM dasturi', wrong: ['Ilk qadam davlat dasturi','Aql va Qo\'l Dasturi','Ilm yo\'li variativ dasturi'] },
+  { q: 'Pedagog va psixologlarimiz fikricha bola 7 yoshgacha insoniyat tajribasining nechchi % o\'zlashtirar ekan?', correct: '50-60 %', wrong: ['50-70 %','40-50 %','30-40 %'] },
+  { q: 'Pedagogik jarayonni bajaruvchi yoki ma\'lum ob\'ektga texnik xizmat ko\'rsatuvchi pedagoglarga taqdim etiladigan barcha zarur ma\'lumotlar, ko\'rsatmalarni o\'z ichiga olgan hujjat — bu?', correct: 'Texnologik xarita', wrong: ['Loyihalash','Modellashtirish','Texnika'] },
+  { q: 'Qachon Isaak Asimovning mashhur robot texnikasi qonunlari "Yolg\'onchi" hikoyasida shakllantirilgan bo\'lib, ular ushbu mashinalarning xatti-harakatlarini tartibga solishga mo\'ljallangan?', correct: '1941 yilda', wrong: ['1944 yilda','1945 yilda','1951 yilda'] },
+  { q: 'Qator taraqqiy etgan davlatlar tajribasida maktabgacha ta\'lim tashkilotlarida bolalarda bog\'lanishli og\'zaki nutqni va ulardagi ilk kommunikativ kompetensiyalarini rivojlantirishga jiddiy yondoshadilar. Bularga qaysi davlatlar kiradi?', correct: 'Janubiy Koreya, Yaponiya, Rossiya, Angliya, Fransiya, Germaniya', wrong: ['Janubiy Koreya, Yaponiya, Rossiya, Angliya, Fransiya, AQSH','Janubiy Koreya, Yaponiya, Rossiya, Angliya, Fransiya, Germaniya, AQSH, Xitoy','Janubiy Koreya, Yaponiya, Rossiya, Angliya, AQSH, Turkiya'] },
+  { q: 'Qaysi davlatlarda ilk yoshdan bolalarni jamiyatdagi ijtimoiy-kommunikativ xulq-odobga o\'rgatish bo\'yicha zamonaviy innovatsion usullar ishlab chiqilgan va amaliyotga joriy etilgan?', correct: 'Janubiy Koreya va Yaponiyada', wrong: ['Janubiy Koreya va AQSHda','Janubiy Koreya va Xitoyda','Janubiy Koreya va Rossiyada'] },
+  { q: 'Qaysi olimlar AQSHning STEAM ta\'limi tajribasini tahlil qilib, gumanitar fanlarning estetika, ergonomika, sotsiologiya, psixologiya, falsafa va boshqalarni rivojlantirish hamda takomillashtirishning kaliti deb hisoblaydilar?', correct: 'G.Yakman va X.Lee.', wrong: ['X.Lee va K.Park','P.Panaritis va K.Park','Svid Kit Xen va X.Lee'] },
+  { q: 'Qobiliyatni ilk va boshlang\'ich tarkibiy qismini toping?', correct: 'Iste\'dod', wrong: ['Qiziqish','Faoliyat','Ziyraklik'] },
+  { q: 'Raqamli va media savodxonligini namoyish etadigan ko\'nikmalar ro\'yxati kim tomonidan ishlab chiqildi?', correct: 'Renee Xobbs', wrong: ['Jorjetta Yakman','Anna Feldman','Erik Robelen'] },
+  { q: 'Real voqelikni u yoki bu darajada shunchaki aniq aks ettirish uchun emas, balki aynan unga o\'xshatish maqsadida qo\'llaniladi; amaliy harakatlarni bajarishga xizmat qiluvchi turli trenajyorlar, mexanizmlar bular qaysi model turiga kiradi?', correct: 'Imitatsion modellar', wrong: ['Ilmiy-texnik modellar','Tajriba modellari','O\'yin modellari'] },
+  { q: 'Real, haqiqatda mavjud bo\'lgan ob\'yektning soddalashtirilgan, kichraytirilgan (kattalashtirilgan) yoki unga o\'xshagan nusxasi nima deb yuritiladi?', correct: 'Model', wrong: ['Texnologik xarita','Texnika','Loyiha'] },
+  { q: 'Refleksiv faoliyat qanday faoliyat?', correct: 'bolada o\'z tushunchalari va xatti-harakatlarini anglash va mustaqil tahlil qilishi asosida xulosalar shakllanishi jarayoni', wrong: ['bolada o\'z xatti-harakatlarini anglash va mustaqil xulosalar shakllanishi jarayoni','bolada mustaqil tahlil qilishi asosida xulosalar shakllanishi jarayoni','bolada o\'z tushunchalari mustaqil tahlil qilishi asosida xulosalar shakllanishi jarayoni'] },
+  { q: 'Robototexnika darslari bolalarning qaysi qobiliyatlarini rivojlanishiga yordam beradi?', correct: 'diqqat, xotira, ijodkorlik', wrong: ['kommunikativ faoliyat','iste\'dod, pedagogik qobiliyat','o\'yin faoliyati'] },
+  { q: '"Shaxsiy kompetensiyani rivojlantirish orqali bola maktabgacha yoshda shakllanadigan va butun hayoti davomida takomillashib boradigan bir qator xususiyatlarni namoyish etadi. Bu qaysi kompetensiyaga tegishli?"', correct: 'Shaxsiy kompetensiya ("Men" konsepsiyasini yaratish)', wrong: ['Ijtimoiy kompetensiya','Bilish kompetensiyasi','Kommunikativ kompetensiya'] },
+  { q: 'Shaxsiy qiziqishlarini hisobga olgan holda, o\'quvchining mustaqil izlanish faoliyatini tashkil etish, uning ijodiy potentsialini ro\'yobga chiqarish, muvaffaqiyatga erishish va o\'zini o\'zi tasdiqlash zarurligini ta\'minlash — bu?', correct: 'Individual loyiha', wrong: ['Metodologiya','Tadqiqotchilik','Ishlab chiqarish'] },
+  { q: 'Singapurning STEMni rivojlantirish mexanizmi qachon ishga tushirilgan?', correct: '2013 yil sentabrda', wrong: ['2014 yil sentabrda','2013 yil noyabrda','2016 yil dekabrda'] },
+  { q: 'Statistikaga ko\'ra, 2011 yildan buyon STEAM-kasblarga bo\'lgan talab darajasi qanchaga oshgan?', correct: '17 % ga', wrong: ['20 % ga','25 % ga','10 % ga'] },
+  { q: 'STEAM yondashuvining eng mashhur namunasi — Massachusets Texnologiya Instituti qaysi davlatda?', correct: 'AQSHda', wrong: ['Yaponiyada','Xitoyda','Rossiyada'] },
+  { q: 'STEAM dasturidagi asosiy g\'oya nima?', correct: '"Hech qanday so\'z yoki vizual tasvirlar aqlning rivojlanishi uchun asos bo\'la olmaydi. Bola barchasini laboratoriyada bajarib ko\'rishi kerak"', wrong: ['Bola barchasini laboratoriyada bajarib ko\'rishi kerak','"to\'g\'ri tashkil etilgan ta\'lim – bolani rivojlanish sari yetaklaydi"','"Hech qanday so\'z yoki vizual tasvirlar aqlning rivojlanishi uchun asos bo\'la olmaydi"'] },
+  { q: 'STEAM faoliyati davomida bolalar ko\'proq qanday usulda o\'rganadi?', correct: 'Tadqiqot va tajriba asosida', wrong: ['Lektsiya eshitish','Mustaqil darslik o\'qish','So\'zlab berish orqali'] },
+  { q: 'STEAM ko\'nikmalarini tez-tez ishlatadigan haqiqiy muammolarni hal qilish va tanqidiy fikrlashni o\'rgatadigan qanday loyiha dastur mavjud?', correct: 'Stenforddan Design Thinking loyihasi', wrong: ['STEAM loyihasi dasturi','Dizayn va Innovatsiya loyihasi','Aql va Qo\'l loyihasi'] },
+  { q: 'STEAM kuni qachondan buyon nishonlanadi va innovatsiya so\'ziga bag\'ishlangan o\'yinli bolalar ta\'tili kuni deb ataladi?', correct: '2015-yil 8-noyabr kunidan boshlab nishonlanadi', wrong: ['2009-yil 8-noyabrdan','2001-yil 18-noyabr','2021-yil 8 yanvardan'] },
+  { q: 'STEAM loyihalarida bolalar qanday ko\'nikmalarni egallaydi?', correct: 'Tanqidiy va ijodiy fikrlash', wrong: ['Tozalash va tartibga rioya qilish','Qurilish mehnatini','O\'zlashtirish qobiliyati'] },
+  { q: 'STEAM qaysi davlatda ishlab chiqilgan?', correct: 'Amerikada ishlab chiqilgan', wrong: ['Germaniyada ishlab chiqilgan','Fransiyada ishlab chiqilgan','Rossiyada ishlab chiqilgan'] },
+  { q: '"STEAM qisqartmasidagi ""S"" harfi nimani anglatadi?"', correct: 'Science (fan)', wrong: ['Social','Sport','Safety'] },
+  { q: 'STEAM so\'zining to\'liq ko\'rinishi qanday?', correct: 'S-science, T-technology, E-engineering, A-art, M-math', wrong: ['S-science, T-technology, E-engineering, A-art, M-mother tongue','S-science, T-technology, E-engineering, A-astronomy, M-math','S-statistique, T-technology, E-engineering, A-art, M-math'] },
+  { q: 'STEAM ta\'limi bosqichlari to\'g\'ri keltirilgan qatorni belgilang', correct: 'savol (vazifa), muhokamalar, dizayn, qurilish, test va takomillashtirish', wrong: ['muhokamalar, dizayn, qurilish, test va takomillashtirish','savol (vazifa), muhokamalar, dizayn, test va takomillashtirish','muhokamalar, dizayn, qurilish, test va takomillashtirish'] },
+  { q: 'STEAM ta\'lim texnologiyasi laboratoriyasi modullari nechta?', correct: '6 ta modul', wrong: ['4 ta modul','3 ta modul','2 ta modul'] },
+  { q: 'STEAM tashabbusi asoschisi kimligini aniqlang?', correct: 'Jorgette Yakman', wrong: ['Mark Uorner','Avram Linkoln','Massachutest universiteti'] },
+  { q: 'STEAM texnologiyasi — bu.........?', correct: 'bu nazariya va amaliyotni birlashtirishning mantiqiy natijasidir', wrong: ['amaliy faoliyat','kichik tajribalar','hamkorlikda ishlash'] },
+  { q: 'STEAM texnologiyasi asosida zaruriy kommunikativ ko\'nikmalarni egallash nomli qo\'llanma muallifi kim?', correct: 'Rut Katchen', wrong: ['G.Catterall','Georgette Yakman','Anna Fildman'] },
+  { q: 'STEAM texnologiyasi qaysi turdagi fikrlashni rivojlantiradi?', correct: 'Tanqidiy, mantiqiy va ijodiy fikrlash', wrong: ['Faqat ijodiy fikrlash','Faqat mantiqiy fikrlash','Aqliy yodlash'] },
+  { q: 'STEAM texnologiyasida — Ilm-fan quvnoq bo\'lishi kerak, u bolalar uchun qiziqarli va o\'ziga jalb qiluvchi bo\'lishi kerak. Bu qanday nomlangan?', correct: 'Science is fun!', wrong: ['Science!','STEM+ STEAM','barchasi to\'g\'ri'] },
+  { q: 'STEAM texnologiyasida qanday natijaga erishish kutiladi?', correct: 'Bolaning o\'zi muammoni hal qilishni o\'rganadi', wrong: ['Darslikdagi mavzularni to\'liq o\'zlashtirish','O\'qituvchining har doim rahbarlik qilishi','Imtihon topshirishga tayyor bo\'lish'] },
+  { q: 'STEAM texnologiyasidagi "E" - engineering - ma\'nosi nima?', correct: 'muhandislik', wrong: ['ilm-fan','san\'at','texnologiya'] },
+  { q: 'STEAM texnologiyasidagi "M" - math - ma\'nosi nima?', correct: 'matematika', wrong: ['ilm-fan','san\'at','muhandislik'] },
+  { q: 'STEAM texnologiyasidagi "T" - technology — ma\'nosi nima?', correct: 'texnologiya', wrong: ['ilm-fan','san\'at','muhandislik'] },
+  { q: 'STEAM texnologiyasining asosiy komponentlari qaysilar?', correct: 'Ilm-fan, texnologiya, muhandislik, san\'at, matematika', wrong: ['Sport, texnologiya, ekologiya, san\'at, matematika','Ijtimoiy fanlar, texnologiya, san\'at, matematika, tarix','Ilm-fan, texnologiya, san\'at, tarix, geografiya'] },
+  { q: 'STEAM texnologiyasining maktabgacha ta\'limga moslashtirilgan shakli qanday bo\'ladi?', correct: 'Integratsiyalashgan o\'yinlar va amaliy topshiriqlar', wrong: ['Og\'zaki suhbat','Qattiq reja asosida o\'qitish','Faqat rasm chizish'] },
+  { q: 'STEAM yondashuvi nechta sohani o\'z ichiga oladi?', correct: '5', wrong: ['4','3','6'] },
+  { q: '"STEAM yondashuvi orqali bola qanday rivojlanadi?"', correct: 'Ijodiy, mantiqiy va mustaqil fikrlovchi bo\'ladi', wrong: ['Jismoniy faolligi oshadi','Katta yoshdagidek intizomli bo\'ladi','Internetdan foydalanishga o\'rganadi'] },
+  { q: 'STEAM yondashuvining boshqa fanlardan farqi nima?', correct: 'Bolalar mavzuni o\'rganish uchun ham aqlni ham qo\'lni ishlatadilar', wrong: ['Mavzular ko\'rgazmalilik asosida olib boriladi','Mavzular yakka tarzda olib boriladi','Mavzular guruh bilan birgalikda o\'rganiladi'] },
+  { q: 'STEAM yondashuvining shakllanishi necha yillik tarixga ega?', correct: '60 yillik', wrong: ['80 yillik','100 yillik','50 yillik'] },
+  { q: 'STEAMga asoslangan ta\'lim erta bolalar ta\'limida qanday amalga oshiriladi?', correct: 'Integratsiyalashgan tarzda', wrong: ['Guruh tarzida','Yakka tarzda','O\'yin tarzda'] },
+  { q: 'STEM ta\'limining mashhur konsepsiyasi birinchi marta kim tomonidan taklif qilindi?', correct: 'amerikalik bakteriolog R.Kolvell', wrong: ['fransiyalik bakteriolog R.Kolvell','fransiyalik bakteriolog A.Karvin','amerikalik fiziolog M.Manturii'] },
+  { q: 'STEM texnologiyasiga qaysi yo\'nalish qo\'shilib takomillashdi?', correct: 'san\'at — art', wrong: ['ilm-fan','texnologiya','muhandislik'] },
+  { q: 'STEM yo\'nalishining rivojlanishiga turtki bo\'lgan Sovet sun\'iy yo\'ldoshi qachon uchirilgan?', correct: '1957 yil', wrong: ['1958 yil','1959 yil','1960 yil'] },
+  { q: 'STEM yondashuvi qachon va qayerda ishlab chiqilgan?', correct: '2001 yilda AQSh Milliy fan fondi olimlari tomonidan taklif qilingan', wrong: ['STEAM yondashuvining eng mashhur namunasi — Massachusets Texnologiya Instituti','2014-yilda Quddusda bo\'lib o\'tgan «STEAM forward» xalqaro konferensiyasida ishlab chiqilgan','2001 yilda AQSh Milliy fanlar akademiyasi olimlari tomonidan taklif qilingan'] },
+  { q: 'STEM-ta\'limning majburiy qismi bolalarni raqamli texnologiyalar bilan tanishishdir. Buning uchun qaysi moduli yaratilgan?', correct: '"Men dunyoni yarataman" moduli', wrong: ['"Robototexnika" o\'quv moduli','"LEGO - qurilish"','Robotexnika o\'quv moduli'] },
+  { q: 'Ta\'lim-tarbiya natijasida o\'zlashtirilgan va tizimlashtirilgan bilim, hosil qilingan ko\'nikma va malakalar hamda tarkib topgan dunyoqarash majmui', correct: 'Ma\'lumot', wrong: ['Bilim','Ko\'nikma','Axborot'] },
+  { q: 'Ta\'lim metodlari qaysilar?', correct: 'Amaliy, og\'zaki, ko\'rsatmali, o\'quv faoliyatini tashkil etish va rag\'batlantirish, nazorat va o\'z-o\'zini nazorat qilish metodlari.', wrong: ['Og\'zaki, ko\'rgazmali, amaliy.','Amaliy va og\'zaki.','O\'quv faoliyatini rag\'batlantirish, nazorat va o\'z-o\'zini nazorat qilish.'] },
+  { q: 'Ta\'lim-tarbiya jarayonida ham integrativ yondashuvlar qachondan yetakchilik qila boshladi?', correct: '1980 yillaming 2-yarmidan', wrong: ['1981 yillaming 2-yarmidan','1980 yillaming 1-yarmidan','1990 yillaming 2-yarmidan'] },
+  { q: 'Tadqiqotlarda kattalar bilan birgalikda ishtirok etadi (eritish, bo\'yash, cho\'kadi – cho\'kmaydi va h.k.). Tadqiqiy-bilish va samarali refleksiv faoliyat sohasi qaysi yosh guruhiga tegishli?', correct: '3-4 yosh', wrong: ['4-5 yosh','5-6 yosh','6-7 yosh'] },
+  { q: 'Taniqli nemis o\'qituvchisi, dunyodagi birinchi maktabgacha yoshdagi bolalar bog\'chasining yaratuvchisi Fridrix Frebelning to\'liq ismi keltirilgan qatorni belgilang', correct: 'Fridrix Vilgelm Avgust Frobiy (1782-1852)', wrong: ['Fridrix Vilgelm Frobiy (1782-1852)','Fridrix Vilgelm Avgust (1782-1852)','Fridrix Vilgelm Frebel (1782-1852)'] },
+  { q: 'Tarbiyaning bola rivojlanishga ta\'siri qanday?', correct: 'Bola ruhiy kamolga yetadi', wrong: ['Bola axloqiy kamolga yetadi','Bola jismoniy kamolga yetadi','Bolaning axloq – odobi tarbiyalanadi.'] },
+  { q: 'Turli shakldagi ma\'lumotlarni qayta ishlovchi vositalar majmuasi — bu?', correct: 'Multimediya', wrong: ['Media','AKT','Diapazon'] },
+  { q: 'Tushuncha — bu?', correct: 'Predmetlar va hodisalami ba\'zi bir muhitni alomatlariga ko\'ra farqlash yoki umumiylashtirish natijasidir', wrong: ['Maktabgacha yoshdagi bolalarda mantiq va algoritmik fikrlashni rivojlantirish','Ma\'lumotlarni to\'g\'ri anglab yetish','Fikrlash va aniqlash jarayoni'] },
+  { q: 'Xalq ta\'limi vazirligi Xitoyda bo\'lib o\'tgan Shanghai International STEM Education Expo (STEAMEX) ko\'rgazmasida qachon ishtirok etdi?', correct: '2019 yilda', wrong: ['2016 yilda','2020 yilda','2017 yilda'] },
+  { q: 'Xalqaro reytingda Kanada ta\'limi AQShdan keyin nechinchi o\'rinda turadi?', correct: 'Ikkinchi o\'rinda', wrong: ['Birinchi o\'rinda','Uchinchi o\'rinda','To\'rtinchi o\'rinda'] },
+  { q: 'XXI asr boshlarida......... iqtisodiyotida ilm-fan, texnologiya, muhandislik va matematika sohalari eng tez rivojlanadigan tarmoqlar hisoblandi. Nuqtalar o\'rnida qaysi davlat berilgan?', correct: 'AQSH', wrong: ['Yaponiya','Koreya','Finlandiya'] },
+  { q: 'Yuradigan robotlami yaratishning nazariy va amaliy masalalariga bag\'ishlangan birinchi nashrlar nechinchi yillarga to\'g\'ri keladi?', correct: '1970-1980 yillarga', wrong: ['1960-1980 yillarga','1970-1990 yillarga','1980-1990 yillarga'] },
+  { q: 'Zamonaviy robotika qanday yo\'nalishlarga bo\'linadi?', correct: 'avtomatlashtirilgan texnik tizimlar fani-sanoat, maishiy, aviatsiya, harbiy, kosmik suv osti suvlariga bo\'linadi', wrong: ['maishiy, aviatsiya, harbiy, kosmik suv osti suvlariga bo\'linadi','avtomatlashtirilgan texnik tizimlar fani-sanoat, maishiy, aviatsiya, harbiy','avtomatlashtirilgan texnik tizimlar fani-sanoat, aviatsiya, harbiy, kosmik suv osti suvlariga bo\'linadi'] },
+  { q: 'Zamonaviy robototexnika nima?', correct: 'Avtomatlashtirilgan texnik tizimlar', wrong: ['Loyihalarni konstruksiyalash','Modellashtirish','Boshqaruv tizimini dasturlash'] },
+  { q: 'Maktabgacha ta\'lim tashkilotida samarali STEAM muhitini yaratishdagi eng asosiy talab nima?', correct: 'Materiallarning xilma-xilligi va ularning bolalar bo\'yi yetadigan, mustaqil tanlab olishi uchun qulay bo\'lgan ochiq javonlarda joylashuvi.', wrong: ['Barcha jihozlar qimmatbaho va so\'nggi rusumdagi texnologiyalardan iborat bo\'lishi.','Xonaning devorlari faqat ilmiy plakatlar va sxemalar bilan bezatilishi.','O\'yinchoqlarning yo\'qolib qolmasligi uchun yopiq, qulflangan shkaflarda saqlanishi.'] },
+  { q: 'Raqamli savodxonlik bu nima?', correct: 'Raqamli muhitda muammolarni samarali hal qilishga imkon beradigan bilim', wrong: ['Tabiiy muhitda muammolarni hal qilish ko\'nikmasi','Raqamli muhitda munosabatlarning asosiy majmuyi','Faqat kompyuterda ishlab bilish'] },
+  { q: 'Bolalarda izlanuvchanlik va eksperimentlik qobiliyatlarini eng yaxshi rivojlantiradigan vositalar qanday bo\'lishi kerak?', correct: 'Ochiq turdagi materiallar: qum, suv, loy, yelim, tabiiy va tashlandiq quti-idishlar.', wrong: ['Qat\'iy bir maqsadga mo\'ljallangan va faqat bitta to\'g\'ri yechimga ega boshqotirmalar.','Tugmasi bosilsa o\'zi harakatlanadigan, bolaning ishtirokini talab qilmaydigan qimmatbaho elektron robotlar','Rasm chizish uchun chiziqdan chiqmaslik talab etiladigan tayyor shablonlar (raskraskalar).'] },
+  { q: 'Bolalar bilan o\'tkaziladigan ilmiy tajribalarning birinchi bosqichi odatda nima bilan boshlanadi?', correct: 'Atrof-muhitni kuzatish, muammoni aniqlash va savol qo\'yish', wrong: ['Tajriba natijalarini daftarga yozib olish.','Xulosa chiqarish va uni boshqalarga tushuntirish.','Tayyor natija va qoidalarni ensiklopediyadan o\'qib berish.'] },
+  { q: 'STEAM texnologiyalarining muhim xususiyati:', correct: 'Amaliy faoliyat va integratsiya', wrong: ['Nazariy bilim ustunligi','Faqat kitob bilan ishlash','Individual ishlash'] },
+  { q: 'Uzluksiz ta\'lim tizimida STEAM qayerdan boshlanadi?', correct: 'Maktabgacha ta\'limdan', wrong: ['Oliy ta\'limdan','Maktabdan','Litseydan'] },
+  { q: 'Pedagogik diagnostika nimani aniqlaydi?', correct: 'Bola rivojlanish darajasini', wrong: ['O\'qituvchi ishini','Dars jadvalini','O\'yinlarni'] },
+  { q: 'Individual rivojlanish dasturi nima?', correct: 'Har bir bola uchun alohida reja', wrong: ['Barcha bolalar uchun bir xil reja','Faqat o\'yinlar rejasi','Faqat dars jadvali'] },
+  { q: 'STEAM tarbiyasida asosiy yondashuv:', correct: 'Faol o\'rganish', wrong: ['Passiv o\'rganish','Faqat eshitish','Faqat yozish'] },
+  { q: 'Sub\'ekt-fazoviy muhit nima?', correct: 'Ta\'lim uchun tashkil etilgan muhit', wrong: ['Faqat xona','Faqat o\'yinchoqlar','Faqat mebel'] },
+  { q: 'Maxsus ta\'limga muhtoj bolalar bilan ishlashda asosiy yondashuv:', correct: 'Individual yondashuv', wrong: ['Bir xil metod','Qattiq nazorat','Faqat dars'] },
+  { q: 'STEM ta\'lim modeli qaysi olimning didaktik qarashlariga yaqin?', correct: 'Frebel', wrong: ['Nyuton','Ibn Sino','Farobiy'] },
+  { q: 'Frebel "tuhfalari" tizimi STEM ta\'limi uchun nimaga asos bo\'ladi?', correct: 'Amaliy va o\'yin asosidagi o\'rganishga', wrong: ['Nazariy bilimga','Faqat yozishga','Faqat testga'] },
+];
+
+// Shuffle function
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// Build shuffled questions with shuffled options
+const questions = rawQuestions.map((q, idx) => {
+  const allOptions = shuffle([q.correct, ...q.wrong]);
+  return {
+    num: idx + 1,
+    q: q.q,
+    options: allOptions,
+    correctIndex: allOptions.indexOf(q.correct)
+  };
+});
+
+// State
+let current = 0;
+let answers = new Array(questions.length).fill(null); // null | index chosen
+let correctCount = 0;
+let wrongCount = 0;
+
+const labels = ['A', 'B', 'D', 'E'];
+
+function render() {
+  const q = questions[current];
+  document.getElementById('q-number').textContent = `SAVOL ${q.num}`;
+  document.getElementById('q-text').textContent = q.q;
+  document.getElementById('num-text').textContent = `Savol ${current + 1}/200`;
+
+  // Progress
+  const answered = answers.filter(a => a !== null).length;
+  document.getElementById('progress-bar').style.width = (answered / questions.length * 100) + '%';
+
+  // Stats
+  document.getElementById('correct-count').textContent = `✓ ${correctCount} to\'g\'ri`;
+  document.getElementById('wrong-count').textContent = `✗ ${wrongCount} xato`;
+
+  // Options
+  const optDiv = document.getElementById('options');
+  optDiv.innerHTML = '';
+  const chosen = answers[current];
+  const isAnswered = chosen !== null;
+
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    if (isAnswered) {
+      if (i === q.correctIndex) btn.classList.add(chosen === i ? 'correct' : 'reveal-correct');
+      else if (i === chosen) btn.classList.add('wrong');
+      btn.disabled = true;
+    }
+    btn.innerHTML = `<span class="label">${labels[i]}</span><span>${opt}</span>`;
+    btn.onclick = () => chooseAnswer(i);
+    optDiv.appendChild(btn);
+  });
+
+  // Feedback
+  const fb = document.getElementById('feedback');
+  const fbIcon = document.getElementById('fb-icon');
+  const fbText = document.getElementById('fb-text');
+  if (isAnswered) {
+    fb.classList.add('show');
+    if (chosen === q.correctIndex) {
+      fb.className = 'feedback show correct-fb';
+      fbIcon.textContent = '✅';
+      fbText.textContent = 'To\'g\'ri javob! Ajoyib!';
+    } else {
+      fb.className = 'feedback show wrong-fb';
+      fbIcon.textContent = '❌';
+      fbText.textContent = `Xato! To\'g\'ri javob: "${q.options[q.correctIndex]}"`;
+    }
+  } else {
+    fb.className = 'feedback';
+  }
+
+  // Nav buttons
+  document.getElementById('prev-btn').disabled = current === 0;
+  const nextBtn = document.getElementById('next-btn');
+  if (current === questions.length - 1) {
+    nextBtn.textContent = 'Natijani ko\'rish 🎓';
+    nextBtn.disabled = false;
+  } else {
+    nextBtn.textContent = 'Keyingi →';
+    nextBtn.disabled = false;
+  }
+
+  // Animate card
+  const card = document.getElementById('question-card');
+  card.style.animation = 'none';
+  card.offsetHeight;
+  card.style.animation = 'fadeIn 0.35s ease';
+}
+
+function chooseAnswer(i) {
+  if (answers[current] !== null) return;
+  answers[current] = i;
+  const q = questions[current];
+  if (i === q.correctIndex) correctCount++;
+  else wrongCount++;
+  render();
+}
+
+function navigate(dir) {
+  if (current === questions.length - 1 && dir === 1) {
+    showResult();
+    return;
+  }
+  const next = current + dir;
+  if (next < 0 || next >= questions.length) return;
+  current = next;
+  render();
+}
+
+function showResult() {
+  document.getElementById('quiz-area').style.display = 'none';
+  const rs = document.getElementById('result-screen');
+  rs.classList.add('show');
+
+  const total = questions.length;
+  const answered = answers.filter(a => a !== null).length;
+  const pct = Math.round((correctCount / total) * 100);
+
+  document.getElementById('r-correct').textContent = correctCount;
+  document.getElementById('r-wrong').textContent = wrongCount;
+  document.getElementById('r-percent').textContent = pct + '%';
+  document.getElementById('r-total').textContent = total;
+
+  let grade, gradeColor, icon, title, sub;
+  if (pct >= 86) { grade = '5'; gradeColor = 'var(--green)'; icon = '🏆'; title = 'A\'lo natija!'; sub = 'Siz STEAM bo\'yicha mutaxasssissiz!'; }
+  else if (pct >= 71) { grade = '4'; gradeColor = 'var(--yellow)'; icon = '🌟'; title = 'Yaxshi natija!'; sub = 'Bilimlaringiz juda yaxshi darajada!'; }
+  else if (pct >= 56) { grade = '3'; gradeColor = 'var(--blue)'; icon = '📚'; title = 'Qoniqarli'; sub = 'Yana bir oz o\'qishingiz kerak!'; }
+  else { grade = '2'; gradeColor = 'var(--red)'; icon = '💪'; title = 'Harakat qiling!'; sub = 'Bilimlarni mustahkamlash kerak!'; }
+
+  document.getElementById('result-icon').textContent = icon;
+  document.getElementById('result-title').textContent = title;
+  document.getElementById('result-sub').textContent = sub;
+  document.getElementById('grade-letter').textContent = grade;
+  document.getElementById('grade-letter').style.color = gradeColor;
+  document.getElementById('grade-text').textContent = `Baho: ${grade} (${pct}%)`;
+}
+
+function restartQuiz() {
+  answers = new Array(questions.length).fill(null);
+  correctCount = 0;
+  wrongCount = 0;
+  current = 0;
+  document.getElementById('result-screen').classList.remove('show');
+  document.getElementById('quiz-area').style.display = 'block';
+  render();
+}
+
+// Init
+render();
+</script>
+</body>
+</html>
